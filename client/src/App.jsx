@@ -1,7 +1,4 @@
-import React from 'react';
 import Lobby from './components/Lobby';
-
-
 
 function App() {
     return (
@@ -9,7 +6,6 @@ function App() {
             <h2>Hola probando</h2>
             {/* <button onClick={ () => { socket.connect()}}>Conectar</button> */}
             <Lobby />
-            {/* Aquí es donde implementarás la lógica del juego */}
         </div>
     );
 }
