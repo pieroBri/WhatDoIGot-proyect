@@ -1,21 +1,33 @@
 const express = require('express');
-const http = require('http');
-const socketIO = require('socket.io');
+const app = express();
+const PORT = 4000;
+
+const http = require('http').Server(app);
+const cors = require('cors');
 const handleRoomEvents = require('./controllers/roomHandlers');
 
-const app = express();
-const server = http.createServer(app);
-const io = socketIO(server);
+app.use(cors());
+
+const io = require('socket.io')(http, {
+    cors: {
+        origin: "http://localhost:5173"
+    }
+});
 
 io.on('connection', (socket) => {
-    console.log('New client connected');
-    
-    handleRoomEvents(socket, io);
-    // Aquí es donde gestionarás eventos como "join room", "start game", etc.
+    console.log(`⚡: ${socket.id} user just connected!`);
+    handleRoomEvents(socket, io)
     socket.on('disconnect', () => {
-        console.log('Client disconnected');
+      console.log('🔥: A user disconnected');
     });
 });
 
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Hello world',
+  });
+});
+
+http.listen(PORT, () => {
+    console.log(`Server listening on ${PORT}`);
+  });
