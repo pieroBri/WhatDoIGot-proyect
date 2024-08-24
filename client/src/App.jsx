@@ -1,11 +1,21 @@
-import Lobby from './components/Lobby';
+import RoomManager, { WaitingLobby } from './components/LobbyManager';
+import {useState} from 'react'
+//import { WaitingCard } from "./components/PlayerCard";
 
 function App() {
+    const [flagLobby, setFlagLobby] = useState(false);
+
+    function cambioDeFlag(value) {
+        setFlagLobby(value);
+        console.log('valor de la flag es: ', flagLobby);
+    }
+
+    
     return (
         <div className="App">
-            <h2>Hola probando</h2>
             {/* <button onClick={ () => { socket.connect()}}>Conectar</button> */}
-            <Lobby />
+            <RoomManager cambioDeFlag={cambioDeFlag}/>
+            <WaitingLobby flag={flagLobby}/>
         </div>
     );
 }
