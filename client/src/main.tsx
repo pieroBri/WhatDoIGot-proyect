@@ -3,13 +3,16 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css'; // Asegúrate de que el archivo existe
+import { SocketProvider } from './context/socketContext';
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
   const root = createRoot(rootElement);
   root.render(
     <StrictMode>
-      <App />
+      <SocketProvider>
+        <App />
+      </SocketProvider>
     </StrictMode>,
   );
 } else {
