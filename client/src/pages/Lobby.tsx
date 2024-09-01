@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Gamepad2 } from "lucide-react";
+import { AlertTriangle, Gamepad2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSocket } from '../context/SocketContext';
 
@@ -17,7 +17,7 @@ function RoomManager() {
     socket.on('connect', () => {
       console.log('Conectado al servidor');
     });
-
+  
     // Limpieza del socket cuando el componente se desmonta
     return () => {
       socket.off('connect');
@@ -35,9 +35,8 @@ function RoomManager() {
     setUserName(localUserName);
     localStorage.setItem('roomName', localRoomName);
     localStorage.setItem('userName', localUserName);
-
     socket.emit('createRoom', localRoomName, localUserName);
-    navigate('/waitingLobby');
+      navigate('/waitingLobby');
   };
 
   const joinRoom = () => {

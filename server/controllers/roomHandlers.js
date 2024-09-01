@@ -16,7 +16,7 @@ function handleRoomEvents(socket, io) {
             io.to(roomName).emit('updateRoom', rooms[roomName].users);
             console.log(`${userName} creó la sala ${roomName}`);
         } else {
-            socket.emit('error', 'Room already exists.');
+            socket.emit('errorRoom', 'Room already exists.');
         }
     });
 
