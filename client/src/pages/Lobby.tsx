@@ -18,11 +18,6 @@ function RoomManager() {
       console.log('Conectado al servidor');
     });
 
-    socket.on('room_noexiste', () => {
-      alert('La sala ingresada no existe');
-      socket.disconnect();
-    });
-
     // Limpieza del socket cuando el componente se desmonta
     return () => {
       socket.off('connect');
@@ -41,15 +36,14 @@ function RoomManager() {
     localStorage.setItem('roomName', localRoomName);
     localStorage.setItem('userName', localUserName);
 
-    socket.connect();
     socket.emit('createRoom', localRoomName, localUserName);
     navigate('/waitingLobby');
   };
 
   const joinRoom = () => {
     if (!localUserName || !localRoomName) {
-      alert('Por favor, ingresa un nombre de usuario y un nombre de sala.');
-      return;
+        alert('Por favor, ingresa un nombre de usuario y un nombre de sala.');
+        return;
     }
 
     setRoomName(localRoomName);
@@ -57,10 +51,19 @@ function RoomManager() {
     localStorage.setItem('roomName', localRoomName);
     localStorage.setItem('userName', localUserName);
 
-    socket.connect();
-    socket.emit('joinRoom', localRoomName, localUserName);
-    navigate('/waitingLobby');
-  };
+
+
+    // Esperar la confirmación de que la sala existe antes de navegar
+    socket.once('room_exists', () => {
+      window.location.href = '/waitingLobby';
+  });
+
+  socket.once('room_noexiste', () => {
+      alert('La sala ingresada no existe');
+      socket.disconnect();
+  });
+};
+
 
   return (
     <>

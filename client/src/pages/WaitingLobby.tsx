@@ -3,15 +3,19 @@ import { Check, X, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { useSocket } from '../context/SocketContext';
+import { useNavigate } from "react-router-dom";
 
 // Define a type for the player
 interface Player {
   name: string;
   isReady: boolean;
+  isOwner: true
 }
 
 export const WaitingLobby = () => {
+  const navigate = useNavigate();
   const [playersList, setPlayersList] = useState<Player[]>([]);
+  const [player, setPlayer] = useState<Player>();
   const [allReady, setAllReady] = useState(false);
   const [userAlreadyInRoom, setUserAlreadyInRoom] = useState(false); 
   const { socket, roomName, userName, setRoomName, setUserName } = useSocket();
@@ -19,38 +23,57 @@ export const WaitingLobby = () => {
   useEffect(() => {
     const storedRoomName = localStorage.getItem('roomName');
     const storedUserName = localStorage.getItem('userName');
-
-    if (storedRoomName && storedUserName) {
-      setRoomName(storedRoomName);
-      setUserName(storedUserName);
+    
 
 
-      socket.connect();
-      socket.emit('joinRoom', storedRoomName, storedUserName);
 
-    }
 
-    socket.on('updateRoom', (users: Player[]) => {
-      // Filtra duplicados y actualiza la lista de jugadores
+    // Manejar la actualización de la sala
+    const handleUpdateRoom = (users: Player[]) => {
       const uniqueUsers = Array.from(new Set(users.map((user) => user.name)))
         .map(name => users.find((user) => user.name === name) as Player);
 
-      setPlayersList(uniqueUsers);
-      setAllReady(uniqueUsers.every((user) => user.isReady));
-
-      setUserAlreadyInRoom(uniqueUsers.some((user) => user.name === userName));
-    });
-
-    return () => {
-      socket.off('updateRoom');
+      setPlayersList(users); // Actualiza la lista sin duplicados
+      setAllReady(users.every((user) => user.isReady));
+      setUserAlreadyInRoom(users.some((user) => user.name === storedUserName)); 
+      setPlayer(users.find((user) => user.name === storedUserName) as Player)
     };
-  }, [socket, setRoomName, setUserName, userName]);
+
+    // Manejar la desconexión de un jugador
+    const handlePlayerDisconnected = (disconnectedUserName: string) => {
+      setPlayersList(prevList => prevList.filter(player => player.name !== disconnectedUserName));
+    };
+
+    // Escuchar los eventos del socket
+    socket.on('updateRoom', handleUpdateRoom);
+    socket.on('playerDisconnected', handlePlayerDisconnected);
+
+    // Limpieza cuando el componente se desmonta
+    return () => {
+      socket.off('updateRoom', handleUpdateRoom);
+      socket.off('playerDisconnected', handlePlayerDisconnected);
+    };
+}, [socket, setRoomName, setUserName]);
+
+// Dependencia de `userName` para asegurarse de que el componente se renderice después de la actualización
+useEffect(() => {
+    if (userName) {
+        socket.emit('updateRoom', roomName); // Pedir actualización de la sala al servidor
+        
+      }
+}, [userName, roomName, socket]);
+
+
 
   const handleExit = () => {
     socket.disconnect();
     localStorage.removeItem('roomName');
     localStorage.removeItem('userName');
+    navigate('/');
   };
+  const userReady = () =>{
+    socket.emit('ready', roomName, userName);
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
@@ -83,17 +106,28 @@ export const WaitingLobby = () => {
             <Button variant="destructive" onClick={handleExit}>
               Exit
             </Button>
-            <Button
-              className="bg-green-600 hover:bg-green-700 text-white"
-              disabled={!allReady || userAlreadyInRoom} // Deshabilita el botón si el usuario ya está en la sala
-            >
-              {allReady ? 'Start' : (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Waiting
-                </>
-              )}
-            </Button>
+            {player?.isOwner ? (
+               <Button
+               className="bg-green-600 hover:bg-green-700 text-white"
+               disabled={!allReady || userAlreadyInRoom} // Deshabilita el botón si el usuario ya está en la sala
+             >
+               {allReady ? 'Start' : (
+                 <>
+                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                   Waiting
+                 </>
+               )}
+             </Button>
+            ): (
+              <Button
+               className="bg-green-600 hover:bg-green-700 text-white"
+               onClick={()=>{userReady()}}
+               disabled={allReady || !userAlreadyInRoom} // Deshabilita el botón si el usuario ya está en la sala
+             >
+              Listo
+             </Button>
+            )}
+           
           </div>
         </CardFooter>
       </Card>

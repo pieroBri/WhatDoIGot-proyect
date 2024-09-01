@@ -23,29 +23,29 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket] = useState(() => io('http://localhost:4000', { autoConnect: false }));
-  
   const [roomName, setRoomName] = useState(() => localStorage.getItem('roomName') || '');
   const [userName, setUserName] = useState(() => localStorage.getItem('userName') || '');
 
-  // Efecto para manejar la conexión automática
   useEffect(() => {
+    // Conectar el socket solo si roomName y userName están presentes
     if (roomName && userName) {
       socket.connect();
       socket.emit('joinRoom', roomName, userName);
     }
 
-    // Desconectar socket al desmontar el componente
+    // Desconectar el socket al desmontar el componente o cuando roomName o userName cambian
     return () => {
       socket.disconnect();
     };
   }, [roomName, userName, socket]);
 
-  // Persistencia en localStorage cuando roomName o userName cambian
   useEffect(() => {
+    // Persistencia en localStorage cuando roomName cambia
     localStorage.setItem('roomName', roomName);
   }, [roomName]);
 
   useEffect(() => {
+    // Persistencia en localStorage cuando userName cambia
     localStorage.setItem('userName', userName);
   }, [userName]);
 

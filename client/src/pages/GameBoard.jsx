@@ -1,4 +1,4 @@
-import PlayerCard from './PlayerCard';
+import PlayerCard from '../components/PlayerCard';
 import './GameBoard.css';
 
 function GameBoard({ players }) {
