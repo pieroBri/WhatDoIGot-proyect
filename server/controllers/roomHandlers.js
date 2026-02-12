@@ -2,15 +2,32 @@ const rooms = {};
 
 function handleRoomEvents(socket, io) {
     socket.on('createRoom', (roomName, userName) => {
-        rooms[roomName] = { users: [] };
-        const nuevoUsuario = {
-            name : userName,
-            isReady : false
-        };
-        socket.join(roomName);
-        rooms[roomName].users.push(nuevoUsuario);
-        io.to(roomName).emit('updateRoom', rooms[roomName].users);
-        console.log(`${userName} created room ${roomName}`);
+
+        if(rooms[roomName]) 
+        {
+            console.log(`El room ${roomName} ya existe`)
+            const nuevoUsuario = 
+            {
+                name : userName,
+                isReady : false
+            };
+            socket.join(roomName);
+            rooms[roomName].users.push(nuevoUsuario);
+            io.to(roomName).emit('updateRoom', rooms[roomName].users);
+        }
+        else
+        {
+            console.log(`El room ${roomName} no existe`)
+            rooms[roomName] = { users: [] };
+            const nuevoUsuario = {
+                name : userName,
+                isReady : false
+            };
+            socket.join(roomName);
+            rooms[roomName].users.push(nuevoUsuario);
+            io.to(roomName).emit('updateRoom', rooms[roomName].users);
+            console.log(`${userName} created room ${roomName}`);
+        }
     });
 
     socket.on('joinRoom', (roomName, userName) => {
