@@ -66,6 +66,11 @@ function RoomManager({ cambioDeFlag }: { cambioDeFlag: (v: boolean) => void }): 
       socket.disconnect()
     })
 
+    socket.on('roomYaExistente', () => {
+      alert('la room ingresada ya existe')
+      socket.disconnect()
+    })
+
     return () => {
       socket.disconnect()
     }
