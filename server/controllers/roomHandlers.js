@@ -1,12 +1,16 @@
 const rooms = {};
 
+
+/*
+    Socket es el cable y io la caja, cualquier acutialización o proceso aplicado sobre io afectara a todas las instacias.
+*/
 function handleRoomEvents(socket, io) {
     socket.on('createRoom', (roomName, userName) => {
 
         if(rooms[roomName]) 
         {
             console.log(`El room ${roomName} ya existe`)
-            io.emit('roomYaExistente');
+            socket.emit('roomYaExistente');
         }
         else
         {
@@ -36,7 +40,7 @@ function handleRoomEvents(socket, io) {
             //console.log(`${userName} joined room ${roomName}`);
             //console.log(`actualmente hay ${rooms[roomName].users}`);
         } else {
-            io.emit('room_noexiste');
+            socket.emit('room_noexiste');
         }
     });
 
