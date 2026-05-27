@@ -1,46 +1,34 @@
-const rooms = {};
-
+const roomsController = require('./roomsController')
 
 /*
     Socket es el cable y io la caja, cualquier acutialización o proceso aplicado sobre io afectara a todas las instacias.
 */
 function handleRoomEvents(socket, io) {
     socket.on('createRoom', (roomName, userName) => {
-
-        if(rooms[roomName]) 
-        {
-            console.log(`El room ${roomName} ya existe`)
-            socket.emit('roomYaExistente');
-        }
-        else
-        {
+        const result = roomsController.createRoom(roomName, { name: userName, isReady: false })
+        if (!result.ok) {
+            if (result.error === 'room_exists') {
+                console.log(`El room ${roomName} ya existe`)
+                socket.emit('roomYaExistente')
+            } else {
+                console.log('createRoom error', result)
+            }
+        } else {
             console.log(`El room ${roomName} no existe, se crea`)
-            rooms[roomName] = { users: [] };
-            const nuevoUsuario = {
-                name : userName,
-                isReady : false
-            };
-            socket.join(roomName);
-            rooms[roomName].users.push(nuevoUsuario);
-            io.to(roomName).emit('updateRoom', rooms[roomName].users);
-            console.log(`${userName} created room ${roomName}`);
+            socket.join(roomName)
+            io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
+            console.log(`${userName} created room ${roomName}`)
         }
     });
 
     socket.on('joinRoom', (roomName, userName) => {
-        if (rooms[roomName]) {
-            const nuevoUsuario = {
-                name : userName,
-                isReady : false
-            };
-            //console.log(`---------------------actualmente hay ${rooms[roomName].users}`);
-            rooms[roomName].users.push(nuevoUsuario);
-            socket.join(roomName);
-            io.to(roomName).emit('updateRoom', rooms[roomName].users);
-            //console.log(`${userName} joined room ${roomName}`);
-            //console.log(`actualmente hay ${rooms[roomName].users}`);
+        const room = roomsController.getRoom(roomName)
+        if (room) {
+            roomsController.addUser(roomName, { name: userName, isReady: false })
+            socket.join(roomName)
+            io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
         } else {
-            socket.emit('room_noexiste');
+            socket.emit('room_noexiste')
         }
     });
 
