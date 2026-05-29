@@ -32,6 +32,18 @@ function handleRoomEvents(socket, io) {
         }
     });
 
+    socket.on('leaveRoom', (roomName, userName) => {
+        const room = roomsController.getRoom(roomName)
+        if(room){
+            roomsController.removeUserByName(roomName, userName)
+            console.log(roomName)
+            socket.leave(roomName)
+            io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
+        }else{
+           socket.emit('room_noexiste') 
+        }
+    });
+
     //socket.on('updateRoom', )
 }
 

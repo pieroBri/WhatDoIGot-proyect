@@ -3,7 +3,7 @@ import { CheckIcon, XIcon } from 'lucide-react'
 import { useRoom, RoomState } from '../context/RoomContext'
 
 export const WaitingLobby = (): JSX.Element | null => {
-  const { state, playersList, setPlayersList, socket } = useRoom()
+  const { state, playersList, setPlayersList, socket, userName, roomName, setState } = useRoom()
 
   useEffect(() => {
     if (!socket) return
@@ -18,6 +18,13 @@ export const WaitingLobby = (): JSX.Element | null => {
       socket.off('updateRoom', handleUpdateRoom)
     }
   }, [socket, setPlayersList])
+
+  const leaveRoom = () => {
+    if (!socket || !roomName || !userName) return
+    socket.emit('leaveRoom', roomName, userName)
+    socket.disconnect()
+    setState(RoomState.ROOM_FORM)
+  }
 
   if (state !== RoomState.WAITING_LOBBY) return null
 
@@ -39,7 +46,7 @@ export const WaitingLobby = (): JSX.Element | null => {
         ))}
       </div>
       <div className="flex justify-between">
-        <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+        <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors" onClick={leaveRoom}>
           Salir
         </button>
         <button className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
