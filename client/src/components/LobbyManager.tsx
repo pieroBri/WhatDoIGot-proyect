@@ -1,92 +1,97 @@
-import React, { useState, useEffect } from 'react'
-import { io, Socket } from 'socket.io-client'
+import React, { useEffect } from 'react'
 import { CheckIcon, XIcon } from 'lucide-react'
+import { useRoom, RoomState } from '../context/RoomContext'
 
-type Player = { id: string; name: string; isReady?: boolean; avatar?: string }
+export const WaitingLobby = (): JSX.Element | null => {
+  const { state, playersList, setPlayersList, socket } = useRoom()
 
-const socket: Socket = io('http://localhost:4000', { autoConnect: false })
-
-export const WaitingLobby = ({ flag }: { flag: boolean }): JSX.Element | null => {
-  const [playersList, setPlayersList] = useState<Player[]>([])
-
-  socket.on('updateRoom', (users: Player[]) => {
-    setPlayersList(users)
-  })
-// AGREGO COMENTARIO, ESTE USE EFFECT PUEDE TENER SENTIDO EN FUTURO
-//   useEffect(() => {
-//     const handler = (users: Player[]) => {
-//       setPlayersList(users)
-//     }
-//     socket.on('updateRoom', handler)
-//     return () => {
-//       socket.off('updateRoom', handler)
-//     }
-//   }, [])
-
-  if (flag) {
-    return (
-      <div className="w-full">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-          {playersList.map((player) => (
-            <div
-              key={player.id}
-              className="border-2 border-gray-200 rounded-lg p-4 flex justify-between items-center bg-white/70"
-            >
-              <span className="text-lg font-medium text-gray-800">{player.name}</span>
-              {player.isReady ? (
-                <CheckIcon className="text-green-500 w-6 h-6" />
-              ) : (
-                <XIcon className="text-red-500 w-6 h-6" />
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-between">
-          <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
-            Salir
-          </button>
-          <button className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
-            Comenzar
-          </button>
-        </div>
-      </div>
-    )
-  }
-}
-
-function RoomManager({ cambioDeFlag }: { cambioDeFlag: (v: boolean) => void }): JSX.Element {
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('conectado creo')
-      cambioDeFlag(true)
-    })
+    if (!socket) return
 
-    socket.on('room_noexiste', () => {
-      alert('la room ingresada no existe')
-      socket.disconnect()
-      cambioDeFlag(false)
-    })
+    const handleUpdateRoom = (users: any[]) => {
+      setPlayersList(users)
+    }
 
-    socket.on('roomYaExistente', () => {
-      alert('la room ingresada ya existe')
-      socket.disconnect()
-      cambioDeFlag(false)
-    })
+    socket.on('updateRoom', handleUpdateRoom)
 
     return () => {
-      socket.disconnect()
+      socket.off('updateRoom', handleUpdateRoom)
     }
-  }, [])
+  }, [socket, setPlayersList])
 
-  const [roomName, setRoomName] = useState<string>('')
-  const [userName, setUserName] = useState<string>('')
+  if (state !== RoomState.WAITING_LOBBY) return null
+
+  return (
+    <div className="w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        {playersList.map((player) => (
+          <div
+            key={player.id}
+            className="border-2 border-gray-200 rounded-lg p-4 flex justify-between items-center bg-white/70"
+          >
+            <span className="text-lg font-medium text-gray-800">{player.name}</span>
+            {player.isReady ? (
+              <CheckIcon className="text-green-500 w-6 h-6" />
+            ) : (
+              <XIcon className="text-red-500 w-6 h-6" />
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between">
+        <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+          Salir
+        </button>
+        <button className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
+          Comenzar
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function RoomManager(): JSX.Element {
+  const { roomName, userName, setRoomName, setUserName, setState, setError, socket } = useRoom()
+
+  useEffect(() => {
+    if (!socket) return
+
+    const handleConnect = () => {
+      console.log('Conectado al servidor')
+      setState(RoomState.WAITING_LOBBY)
+    }
+
+    const handleRoomNoExiste = () => {
+      setError('La sala ingresada no existe')
+      socket.disconnect()
+      setState(RoomState.ROOM_FORM)
+    }
+
+    const handleRoomYaExistente = () => {
+      setError('La sala ingresada ya existe')
+      socket.disconnect()
+      setState(RoomState.ROOM_FORM)
+    }
+
+    socket.on('connect', handleConnect)
+    socket.on('room_noexiste', handleRoomNoExiste)
+    socket.on('roomYaExistente', handleRoomYaExistente)
+
+    return () => {
+      socket.off('connect', handleConnect)
+      socket.off('room_noexiste', handleRoomNoExiste)
+      socket.off('roomYaExistente', handleRoomYaExistente)
+    }
+  }, [socket, setState, setError])
 
   const createRoom = () => {
+    if (!socket || !roomName || !userName) return
     socket.connect()
     socket.emit('createRoom', roomName, userName)
   }
 
   const joinRoom = () => {
+    if (!socket || !roomName || !userName) return
     socket.connect()
     socket.emit('joinRoom', roomName, userName)
   }
@@ -97,14 +102,14 @@ function RoomManager({ cambioDeFlag }: { cambioDeFlag: (v: boolean) => void }): 
         <input
           type="text"
           placeholder="Room Name"
-          value={roomName}
+          value={roomName || ''}
           onChange={(e) => setRoomName(e.target.value)}
           className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white/80"
         />
         <input
           type="text"
           placeholder="Your Name"
-          value={userName}
+          value={userName || ''}
           onChange={(e) => setUserName(e.target.value)}
           className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white/80"
         />

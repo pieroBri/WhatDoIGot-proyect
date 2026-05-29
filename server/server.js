@@ -86,6 +86,16 @@ app.put('/api/rooms/:room/users/:username', (req, res) => {
   res.json({ ok: true, user: result.user })
 })
 
+//Eliminar todas las rooms (para testing)
+app.delete('/api/rooms/', (req, res) => {  const { roomName } = req.body
+  const rooms = roomsController.getAll()
+  Object.keys(rooms).forEach((room) => {
+    roomsController.removeRoom(room)
+    io.to(room).emit('room_deleted')
+  })
+  res.json({ ok: true, removed: Object.keys(rooms).length })
+})
+
 http.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
   });
