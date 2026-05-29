@@ -36,9 +36,12 @@ function handleRoomEvents(socket, io) {
         const room = roomsController.getRoom(roomName)
         if(room){
             roomsController.removeUserByName(roomName, userName)
-            console.log(roomName)
             socket.leave(roomName)
             io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
+            if(roomsController.getRoom(roomName).users.length === 0){
+                roomsController.removeRoom(roomName)
+                console.log(`El room ${roomName} se ha eliminado por estar vacio`)
+            }
         }else{
            socket.emit('room_noexiste') 
         }

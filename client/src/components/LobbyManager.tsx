@@ -5,20 +5,6 @@ import { useRoom, RoomState } from '../context/RoomContext'
 export const WaitingLobby = (): JSX.Element | null => {
   const { state, playersList, setPlayersList, socket, userName, roomName, setState } = useRoom()
 
-  useEffect(() => {
-    if (!socket) return
-
-    const handleUpdateRoom = (users: any[]) => {
-      setPlayersList(users)
-    }
-
-    socket.on('updateRoom', handleUpdateRoom)
-
-    return () => {
-      socket.off('updateRoom', handleUpdateRoom)
-    }
-  }, [socket, setPlayersList])
-
   const leaveRoom = () => {
     if (!socket || !roomName || !userName) return
     socket.emit('leaveRoom', roomName, userName)
@@ -59,37 +45,6 @@ export const WaitingLobby = (): JSX.Element | null => {
 
 function RoomManager(): JSX.Element {
   const { roomName, userName, setRoomName, setUserName, setState, setError, socket } = useRoom()
-
-  useEffect(() => {
-    if (!socket) return
-
-    const handleConnect = () => {
-      console.log('Conectado al servidor')
-      setState(RoomState.WAITING_LOBBY)
-    }
-
-    const handleRoomNoExiste = () => {
-      setError('La sala ingresada no existe')
-      socket.disconnect()
-      setState(RoomState.ROOM_FORM)
-    }
-
-    const handleRoomYaExistente = () => {
-      setError('La sala ingresada ya existe')
-      socket.disconnect()
-      setState(RoomState.ROOM_FORM)
-    }
-
-    socket.on('connect', handleConnect)
-    socket.on('room_noexiste', handleRoomNoExiste)
-    socket.on('roomYaExistente', handleRoomYaExistente)
-
-    return () => {
-      socket.off('connect', handleConnect)
-      socket.off('room_noexiste', handleRoomNoExiste)
-      socket.off('roomYaExistente', handleRoomYaExistente)
-    }
-  }, [socket, setState, setError])
 
   const createRoom = () => {
     if (!socket || !roomName || !userName) return
