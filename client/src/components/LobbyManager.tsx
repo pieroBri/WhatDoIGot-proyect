@@ -3,21 +3,14 @@ import { CheckIcon, XIcon } from 'lucide-react'
 import { useRoom, RoomState } from '../context/RoomContext'
 
 export const WaitingLobby = (): JSX.Element | null => {
-  const { state, playersList, setPlayersList, socket } = useRoom()
+  const { state, playersList, setPlayersList, socket, userName, roomName, setState } = useRoom()
 
-  useEffect(() => {
-    if (!socket) return
-
-    const handleUpdateRoom = (users: any[]) => {
-      setPlayersList(users)
-    }
-
-    socket.on('updateRoom', handleUpdateRoom)
-
-    return () => {
-      socket.off('updateRoom', handleUpdateRoom)
-    }
-  }, [socket, setPlayersList])
+  const leaveRoom = () => {
+    if (!socket || !roomName || !userName) return
+    socket.emit('leaveRoom', roomName, userName)
+    socket.disconnect()
+    setState(RoomState.ROOM_FORM)
+  }
 
   if (state !== RoomState.WAITING_LOBBY) return null
 
@@ -39,7 +32,7 @@ export const WaitingLobby = (): JSX.Element | null => {
         ))}
       </div>
       <div className="flex justify-between">
-        <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+        <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors" onClick={leaveRoom}>
           Salir
         </button>
         <button className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
@@ -52,37 +45,6 @@ export const WaitingLobby = (): JSX.Element | null => {
 
 function RoomManager(): JSX.Element {
   const { roomName, userName, setRoomName, setUserName, setState, setError, socket } = useRoom()
-
-  useEffect(() => {
-    if (!socket) return
-
-    const handleConnect = () => {
-      console.log('Conectado al servidor')
-      setState(RoomState.WAITING_LOBBY)
-    }
-
-    const handleRoomNoExiste = () => {
-      setError('La sala ingresada no existe')
-      socket.disconnect()
-      setState(RoomState.ROOM_FORM)
-    }
-
-    const handleRoomYaExistente = () => {
-      setError('La sala ingresada ya existe')
-      socket.disconnect()
-      setState(RoomState.ROOM_FORM)
-    }
-
-    socket.on('connect', handleConnect)
-    socket.on('room_noexiste', handleRoomNoExiste)
-    socket.on('roomYaExistente', handleRoomYaExistente)
-
-    return () => {
-      socket.off('connect', handleConnect)
-      socket.off('room_noexiste', handleRoomNoExiste)
-      socket.off('roomYaExistente', handleRoomYaExistente)
-    }
-  }, [socket, setState, setError])
 
   const createRoom = () => {
     if (!socket || !roomName || !userName) return

@@ -41,8 +41,41 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
       socketRef.current = io('http://localhost:4000', { autoConnect: false })
     }
 
+    const socket = socketRef.current;
+
+    const handleConnect = () => {
+      console.log('Conectado al servidor')
+      setState(RoomState.WAITING_LOBBY)
+    }
+
+    const handleRoomNoExiste = () => {
+      setError('La sala ingresada no existe')
+      socket.disconnect()
+      setState(RoomState.ROOM_FORM)
+    }
+
+    const handleRoomYaExistente = () => {
+      setError('La sala ingresada ya existe')
+      socket.disconnect()
+      setState(RoomState.ROOM_FORM)
+    }
+
+    const handleUpdateRoom = (users: Player[]) => {
+      setPlayersList(users)
+    }
+
+    if (!socket) return
+
+    socket.on('connect', handleConnect)
+    socket.on('room_noexiste', handleRoomNoExiste)
+    socket.on('roomYaExistente', handleRoomYaExistente)
+    socket.on('updateRoom', handleUpdateRoom)
+
     return () => {
-      // Cleanup: desconectar solo al desmontar el provider
+      socket.off('connect', handleConnect)
+      socket.off('room_noexiste', handleRoomNoExiste)
+      socket.off('roomYaExistente', handleRoomYaExistente)
+      socket.off('updateRoom', handleUpdateRoom)
       if (socketRef.current?.connected) {
         socketRef.current.disconnect()
       }
