@@ -53,9 +53,9 @@ function handleRoomEvents(socket, io) {
 function asignarMaster(roomName) {
     const room = roomsController.getRoom(roomName)
     if (room) {
-        const masterUser = room.users.find(user => user.master)
+        const masterUser = room.users.find(user => user.isMaster)
         if (!masterUser && room.users.length > 0) {
-            room.users[0].master = true
+            room.users[0].isMaster = true
             console.log(`El usuario ${room.users[0].name} ha sido asignado como master del room ${roomName}`)
         }
     }
