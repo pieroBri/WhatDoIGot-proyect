@@ -51,6 +51,7 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
 
     const handleConnect = () => {
       console.log('Conectado al servidor')
+      setError(null)
       setState(RoomState.WAITING_LOBBY)
     }
 
@@ -67,6 +68,7 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const handleUpdateRoom = (users: Player[]) => {
+      setError(null)
       setPlayersList(users)
     }
 

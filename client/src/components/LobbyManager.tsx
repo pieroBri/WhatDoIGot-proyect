@@ -16,6 +16,7 @@ export const WaitingLobby = (): JSX.Element | null => {
     (player) => player.name === userName && player.isMaster
   )
 
+  //UseEffect para debuggear el estado del lobby
   useEffect(() => {
     console.log('WaitingLobby debug:', { userName, isCurrentUserMaster, playersList })
   }, [userName, isCurrentUserMaster, playersList])
