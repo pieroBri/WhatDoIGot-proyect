@@ -6,8 +6,8 @@ function AppContent(): JSX.Element {
   const { state, error } = useRoom()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-700 to-pink-600 flex items-center justify-center p-6">
-      <div className="w-full max-w-4xl p-8 bg-white/90 rounded-3xl shadow-xl backdrop-blur-sm">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-900 to-violet-500 flex items-center justify-center p-6">
+      <div className="w-full max-w-4xl p-8 bg-slate-300 rounded-3xl shadow-xl backdrop-blur-sm">
         {error && (
           <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
             {error}
