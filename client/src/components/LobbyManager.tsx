@@ -12,6 +12,14 @@ export const WaitingLobby = (): JSX.Element | null => {
     setState(RoomState.ROOM_FORM)
   }
 
+  const isCurrentUserMaster = playersList.some(
+    (player) => player.name === userName && player.isMaster
+  )
+
+  useEffect(() => {
+    console.log('WaitingLobby debug:', { userName, isCurrentUserMaster, playersList })
+  }, [userName, isCurrentUserMaster, playersList])
+
   if (state !== RoomState.WAITING_LOBBY) return null
 
   return (
@@ -35,9 +43,11 @@ export const WaitingLobby = (): JSX.Element | null => {
         <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors" onClick={leaveRoom}>
           Salir
         </button>
-        <button className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
-          Comenzar
-        </button>
+        {isCurrentUserMaster && (
+          <button className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
+            Comenzar
+          </button>
+        )}
       </div>
     </div>
   )

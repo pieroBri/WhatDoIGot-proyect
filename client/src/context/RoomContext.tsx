@@ -9,7 +9,13 @@ export enum RoomState {
   DISCONNECTED = 'DISCONNECTED',
 }
 
-type Player = { id: string; name: string; isReady?: boolean; avatar?: string }
+type Player = { 
+  id: string; 
+  name: string;
+  isReady?: boolean;
+  avatar?: string;
+  isMaster?: boolean;
+}
 
 interface RoomContextType {
   state: RoomState
