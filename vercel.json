@@ -1,7 +1,16 @@
 {
+  "version": 2,
   "buildCommand": "cd swagger && npm install",
-  "outputDirectory": "swagger",
-  "rewrites": [
-    {"source": "/(.*)", "destination": "/api"}
+  "builds": [
+    {
+      "src": "swagger/api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/swagger/api/index.js"
+    }
   ]
 }
