@@ -1,21 +1,10 @@
 {
-  "name": "swagger",
+  "name": "swagger-docs",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "description": "Swagger API Documentation",
+  "main": "api/index.js",
   "dependencies": {
-    "swagger-autogen": "^2.23.7",
-    "swagger-jsdoc": "^6.3.0",
     "express": "^4.22.2",
-    "install": "^0.13.0",
-    "npm": "^11.16.0",
     "swagger-ui-express": "^5.0.1"
   }
 }
