@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd swagger && npm install",
+  "outputDirectory": "swagger",
+  "rewrites": [
+    {"source": "/(.*)", "destination": "/api"}
+  ]
+}
