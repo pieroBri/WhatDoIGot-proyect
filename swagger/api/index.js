@@ -8,4 +8,5 @@ const app = express();
 // Swagger UI setup - sirve en la raíz
 app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocumentation));
 
+// Export for Vercel Serverless Functions
 module.exports = app;
