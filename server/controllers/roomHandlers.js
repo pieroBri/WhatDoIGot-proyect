@@ -48,6 +48,21 @@ function handleRoomEvents(socket, io) {
         }
     });
 
+    socket.on('toggleReady', (roomName, userName) => {
+        const room = roomsController.getRoom(roomName)
+        if(room){
+            const user = room.users.find(user => user.name === userName)
+            if(user){
+                user.isReady = !user.isReady
+                io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
+            }else{
+                socket.emit('user_noexiste')
+            }
+        }else{
+           socket.emit('room_noexiste') 
+        }
+    });
+
 }
 
 function asignarMaster(roomName) {

@@ -12,6 +12,11 @@ export const WaitingLobby = (): JSX.Element | null => {
     setState(RoomState.ROOM_FORM)
   }
 
+  const toggleReady = () => {
+    if (!socket || !roomName || !userName) return
+    socket.emit('toggleReady', roomName, userName)
+  }
+
   const isCurrentUserMaster = playersList.some(
     (player) => player.name === userName && player.isMaster
   )
@@ -43,6 +48,9 @@ export const WaitingLobby = (): JSX.Element | null => {
       <div className="flex justify-between">
         <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors" onClick={leaveRoom}>
           Salir
+        </button>
+        <button className="px-6 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors" onClick={toggleReady}>
+          Listo
         </button>
         {isCurrentUserMaster && (
           <button className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
