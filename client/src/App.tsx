@@ -6,10 +6,10 @@ function AppContent(): JSX.Element {
   const { state, error } = useRoom()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-900 to-violet-500 flex items-center justify-center p-6">
-      <div className="w-full max-w-4xl p-8 bg-slate-300 rounded-3xl shadow-xl backdrop-blur-sm">
+    <div className="container-dark">
+      <div className="card-dark">
         {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+          <div className="mb-4 p-4 bg-red-500/20 border border-red-500 text-red-300 rounded-md">
             {error}
           </div>
         )}
