@@ -21,9 +21,6 @@ const io = require('socket.io')(http, {
 io.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
     handleRoomEvents(socket, io)
-    socket.on('disconnect', () => {
-      console.log('🔥: A user disconnected');
-    });
 });
 
 // Obtiene una room por nombre

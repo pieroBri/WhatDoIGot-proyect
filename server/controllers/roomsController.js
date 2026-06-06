@@ -36,6 +36,19 @@ class RoomsController {
     return { ok: true };
   }
 
+  // Remove a user by their socket id from a single room.
+  removeUserById(userId) {
+    for (const roomName of Object.keys(this.rooms)) {
+      const room = this.rooms[roomName]
+      const idx = room.users.findIndex((u) => u.id === userId)
+      if (idx !== -1) {
+        room.users.splice(idx, 1)
+        return { ok: true, roomName }
+      }
+    }
+    return { ok: true, roomName: null }
+  }
+
   removeUserByName(roomName, userName) {
     const room = this.rooms[roomName];
     if (!room) return { ok: false, error: "room_not_found" };
