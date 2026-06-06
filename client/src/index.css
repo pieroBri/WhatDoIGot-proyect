@@ -46,6 +46,14 @@
     @apply px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors font-medium;
   }
 
+  .btn-success:disabled {
+    @apply bg-green-800 opacity-60 cursor-not-allowed;
+  }
+
+  .btn-success:disabled:hover {
+    @apply bg-green-800;
+  }
+
   .btn-danger {
     @apply px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors;
   }
