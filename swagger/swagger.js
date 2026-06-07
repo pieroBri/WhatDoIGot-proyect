@@ -9,7 +9,7 @@ const doc = {
     schemes: ['http']
 }
 
-const outputFile = './swagger_output.json';
+const outputFile = './public/swagger_output.json';
 const endpointsFiles = ['../server/routes/RoomRoutes.js']; // Cambia este archivo según el punto de entrada de tu API
 
 swaggerAutogen(outputFile, endpointsFiles, doc);

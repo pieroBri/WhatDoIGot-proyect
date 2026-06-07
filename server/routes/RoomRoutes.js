@@ -2,194 +2,211 @@ const { Router } = require('express');
 const roomsController = require('../controllers/roomsController');
 const router = Router();
 
-/**
- * @swagger
- * /rooms:
- *   get:
- *     summary: Get all rooms
- *     tags: [Rooms]
- *     responses:
- *       200:
- *         description: List of all rooms
- */
-router.get('/rooms', (req, res) => {
-    const room = roomsController.getRoom(req.params.room)
-    if(!room) return res.status(404).json({error:'not_found'})
-    res.json(room)
+router.get('/rooms', (roomName) => {
+
+    /* #swagger.tags = ['Rooms'] */
+    /* #swagger.summary = 'Get all rooms' */
+    /* #swagger.description = 'Returns all application rooms' */
+
+    /* #swagger.responses[200] = {
+        description: 'Rooms retrieved successfully',
+        schema: [
+            {
+                roomName: 'General Chat',
+                users: [
+                    {
+                        username: 'juan123'
+                    },
+                    {
+                        username: 'maria456'
+                    }
+                ]
+            }
+        ],
+        example: [ 
+            { 
+                roomName: 'General Chat', 
+                users: [ 
+                    { 
+                        username: 'juan123' 
+                    }, 
+                    {   
+                        username: 'maria456' 
+                    } 
+                ] 
+            }
+        ]
+    } */
+    roomsController.getAll();
 })
 
-/**
- * @swagger
- * /rooms/{room}:
- *   get:
- *     summary: Get a specific room
- *     tags: [Rooms]
- *     parameters:
- *       - in: path
- *         name: room
- *         schema:
- *           type: string
- *         required: true
- *         description: Room identifier
- *     responses:
- *       200:
- *         description: Room details
- *       404:
- *         description: Room not found
- */
-router.get('/rooms/:room', roomsController.getRoom);
 
-/**
- * @swagger
- * /rooms:
- *   post:
- *     summary: Create a new room
- *     tags: [Rooms]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
- *       201:
- *         description: Room created successfully
- */
-router.post('/rooms', (req, res) => roomsController.createRoom(req, res));
+router.get('/rooms/:room', (roomName) => {
+    /* #swagger.tags = ['Rooms'] */
+    /* #swagger.summary = 'Get all rooms' */
+    /* #swagger.description = 'Returns all application rooms' */
 
-/**
- * @swagger
- * /rooms/{room}:
- *   delete:
- *     summary: Delete a room
- *     tags: [Rooms]
- *     parameters:
- *       - in: path
- *         name: room
- *         schema:
- *           type: string
- *         required: true
- *         description: Room identifier
- *     responses:
- *       200:
- *         description: Room deleted successfully
- *       404:
- *         description: Room not found
- */
-router.delete('/rooms/:room', roomsController.removeRoom);
+    /* #swagger.responses[200] = {
+        description: 'Rooms retrieved successfully',
+        schema: [
+            {
+                roomName: 'General Chat',
+                users: [
+                    {
+                        username: 'juan123'
+                    },
+                    {
+                        username: 'maria456'
+                    }
+                ]
+            }
+        ],
+        example: [ 
+            { 
+                roomName: 'General Chat', 
+                users: [ 
+                    { 
+                        username: 'juan123' 
+                    }, 
+                    {   
+                        username: 'maria456' 
+                    } 
+                ] 
+            }
+        ]
+    } */
 
-/**
- * @swagger
- * /rooms/{room}:
- *   put:
- *     summary: Rename a room
- *     tags: [Rooms]
- *     parameters:
- *       - in: path
- *         name: room
- *         schema:
- *           type: string
- *         required: true
- *         description: Room identifier
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
- *       200:
- *         description: Room renamed successfully
- *       404:
- *         description: Room not found
- */
-router.put('/rooms/:room', roomsController.renameRoom);
+    /* #swagger.responses[404] = {
+        description: 'Error retrieving rooms',
+        schema: {
+            message: 'not_found'
+        }
+    } */
+    roomsController.getRoom(roomName)
+});
 
-/**
- * @swagger
- * /rooms/{room}/users:
- *   post:
- *     summary: Add a user to a room
- *     tags: [Rooms, Users]
- *     parameters:
- *       - in: path
- *         name: room
- *         schema:
- *           type: string
- *         required: true
- *         description: Room identifier
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
- *       200:
- *         description: User added successfully
- *       404:
- *         description: Room not found
- */
-router.post('/rooms/:room/users', roomsController.addUser);
 
-/**
- * @swagger
- * /rooms/{room}/users/{user}:
- *   delete:
- *     summary: Remove a user from a room
- *     tags: [Rooms, Users]
- *     parameters:
- *       - in: path
- *         name: room
- *         schema:
- *           type: string
- *         required: true
- *         description: Room identifier
- *       - in: path
- *         name: user
- *         schema:
- *           type: string
- *         required: true
- *         description: User identifier
- *     responses:
- *       200:
- *         description: User removed successfully
- *       404:
- *         description: Room or user not found
- */
-router.delete('/rooms/:room/users/:user', roomsController.removeUserByName);
+router.post('/rooms', (roomName, userName) => {
+    
+    /* #swagger.tags = ['Rooms'] */
+    /* #swagger.summary = 'Create rooms' */
+    /* #swagger.description = 'Create a room' */
 
-/**
- * @swagger
- * /rooms/{room}/users/{user}:
- *   put:
- *     summary: Update a user in a room
- *     tags: [Rooms, Users]
- *     parameters:
- *       - in: path
- *         name: room
- *         schema:
- *           type: string
- *         required: true
- *         description: Room identifier
- *       - in: path
- *         name: user
- *         schema:
- *           type: string
- *         required: true
- *         description: User identifier
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
- *       200:
- *         description: User updated successfully
- *       404:
- *         description: Room or user not found
- */
-router.put('/rooms/:room/users/:user', roomsController.updateUserByName);
+    /* #swagger.responses[200] = {
+        description: 'Rooms Create successfully',
+        schema: [
+            {
+                roomName: 'General Chat',
+                username: 'Piero'
+            }
+        ],
+        example: [ 
+            { 
+                roomName: 'General Chat',
+                username: 'Piero'
+            }
+        ]
+    } */
+    roomsController.createRoom(roomName, userName)
+});
+
+
+router.delete('/rooms/:room', (roomName) => {
+    
+    /* #swagger.tags = ['Rooms'] */
+    /* #swagger.summary = 'Delete room' */
+    /* #swagger.description = 'Delete a room' */
+
+    /* #swagger.responses[200] = {
+        description: 'Rooms Deleted successfully',
+        schema: [
+            {
+                roomName: 'General Chat'
+            }
+        ],
+        example: [ 
+            { 
+                roomName: 'General Chat'
+            }
+        ]
+    } */
+
+     /* #swagger.responses[400] = {
+        description: 'Error deleting rooms',
+        schema: {
+            message: 'not_found'
+        }
+    } */
+    roomsController.removeRoom
+});
+
+router.put('/rooms/:room', (newRoomName, oldRoomName) => {
+    /* #swagger.tags = ['Rooms'] */
+    /* #swagger.summary = 'Rename room' */
+    /* #swagger.description = 'Rename a room' */
+
+    /* #swagger.responses[200] = {
+        description: 'Rooms Renamed successfully',
+        schema: [
+            {
+                oldRoomName: 'General Chat',
+                newRoomName: 'Tuki chat'
+            }
+        ],
+        example: [ 
+            { 
+                oldRoomName: 'General Chat',
+                newRoomName: 'Tuki chat'
+            }
+        ]
+    } */
+
+     /* #swagger.responses[400] = {
+        description: 'Error renaming rooms',
+        schema: {
+            message: 'Error renaming rooms'
+        }
+    } */
+    roomsController.renameRoom(newRoomName, oldRoomName)
+});
+
+router.post('/rooms/:room/users', (roomName, user) => {
+    /* #swagger.tags = ['Rooms'] */
+    /* #swagger.summary = 'Add user' */
+    /* #swagger.description = 'Add user' */
+
+    /* #swagger.responses[200] = {
+        description: 'User added successfully',
+        schema: [
+            {
+                roomName: 'General Chat',
+                user: 'Tuki'
+            }
+        ],
+        example: [ 
+            { 
+                roomName: 'General Chat',
+                user: 'Tuki'
+            }
+        ]
+    } */
+
+     /* #swagger.responses[404] = {
+        description: 'Error rooms',
+        schema: {
+            message: 'Room not found'
+        }
+    } */
+    roomsController.addUser(roomName, user)
+});
+
+router.delete('/rooms/:room/users/:user', (roomName, user) => {
+
+    roomsController.removeUserByName(roomName, user)
+});
+
+router.put('/rooms/:room/users/:user', (roomName, userName, newUser) => {
+    roomsController.updateUserByName(roomName, userName, newUser)
+});
 
 module.exports = router;
