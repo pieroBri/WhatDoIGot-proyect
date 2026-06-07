@@ -5,7 +5,7 @@ const roomsController = require('./roomsController')
 */
 function handleRoomEvents(socket, io) {
     socket.on('createRoom', (roomName, userName) => {
-        const result = roomsController.createRoom(roomName, { name: userName, isReady: false, isMaster: true })
+        const result = roomsController.createRoom(roomName, { id: socket.id, name: userName, isReady: false, isMaster: true })
         if (!result.ok) {
             if (result.error === 'room_exists') {
                 console.log(`El room ${roomName} ya existe`)
@@ -24,7 +24,7 @@ function handleRoomEvents(socket, io) {
     socket.on('joinRoom', (roomName, userName) => {
         const room = roomsController.getRoom(roomName)
         if (room) {
-            roomsController.addUser(roomName, { name: userName, isReady: false, isMaster: false })
+            roomsController.addUser(roomName, { id: socket.id, name: userName, isReady: false, isMaster: false })
             socket.join(roomName)
             io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
         } else {
@@ -45,6 +45,42 @@ function handleRoomEvents(socket, io) {
             }
         }else{
            socket.emit('room_noexiste') 
+        }
+    });
+
+    socket.on('toggleReady', (roomName, userName) => {
+        const room = roomsController.getRoom(roomName)
+        if(room){
+            const user = room.users.find(user => user.name === userName)
+            if(user){
+                user.isReady = !user.isReady
+                io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
+            }else{
+                socket.emit('user_noexiste')
+            }
+        }else{
+           socket.emit('room_noexiste') 
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('🔥: A user disconnected', socket.id)
+        const result = roomsController.removeUserById(socket.id)
+        if (result.ok && result.roomName) {
+            const roomName = result.roomName
+            const room = roomsController.getRoom(roomName)
+            if (room) {
+                asignarMaster(roomName)
+                if (room.users.length === 0) {
+                    roomsController.removeRoom(roomName)
+                    io.to(roomName).emit('room_deleted')
+                    console.log(`El room ${roomName} se ha eliminado por estar vacio`)
+                } else {
+                    io.to(roomName).emit('updateRoom', room.users)
+                }
+            } else {
+                io.to(roomName).emit('room_deleted')
+            }
         }
     });
 

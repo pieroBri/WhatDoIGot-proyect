@@ -2,6 +2,7 @@
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJSDoc = require("swagger-jsdoc");
+const swaggerDocumentation = require("./public/swagger_output.json");
 
 const app = express();
 const port = 3000;
@@ -33,12 +34,9 @@ const swaggerOptions = {
   apis: ["./routes/*.js"], // Path to your API docs
 };
 
-const swaggerDocs = swaggerJSDoc(swaggerOptions);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocumentation));
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
 
-const userRoutes = require("./routes/user");
-app.use("/", userRoutes);

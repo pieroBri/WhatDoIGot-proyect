@@ -19,9 +19,6 @@ const io = require('socket.io')(http, {
 io.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
     handleRoomEvents(socket, io)
-    socket.on('disconnect', () => {
-      console.log('🔥: A user disconnected');
-    });
 });
 
 app.get('/api', (req, res) => {

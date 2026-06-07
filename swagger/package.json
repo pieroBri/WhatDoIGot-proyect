@@ -1,0 +1,13 @@
+{
+  "name": "whatdoigot-swagger-docs",
+  "version": "1.0.0",
+  "description": "Documentación estática de la API",
+  "main": "swagger.js",
+  "scripts": {
+    "generate": "node swagger.js",
+    "build": "npm run generate"
+  },
+  "dependencies": {
+    "swagger-autogen": "^2.23.7"
+  }
+}

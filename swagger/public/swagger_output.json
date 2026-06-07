@@ -1,0 +1,406 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API What do i got",
+    "description": "Documentación de la API para el proyecto What do i got",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/rooms": {
+      "get": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Get all rooms",
+        "description": "Returns all application rooms",
+        "responses": {
+          "200": {
+            "description": "Rooms retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roomName": {
+                    "type": "string",
+                    "example": "General Chat"
+                  },
+                  "users": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "username": {
+                          "type": "string",
+                          "example": "maria456"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            },
+            "example": [
+              {
+                "roomName": "General Chat",
+                "users": [
+                  {
+                    "username": "juan123"
+                  },
+                  {
+                    "username": "maria456"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Create rooms",
+        "description": "Create a room",
+        "responses": {
+          "200": {
+            "description": "Rooms Create successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roomName": {
+                    "type": "string",
+                    "example": "General Chat"
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "Piero"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            },
+            "example": [
+              {
+                "roomName": "General Chat",
+                "username": "Piero"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "/rooms/{room}": {
+      "get": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Get all rooms",
+        "description": "Returns all application rooms",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rooms retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roomName": {
+                    "type": "string",
+                    "example": "General Chat"
+                  },
+                  "users": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "username": {
+                          "type": "string",
+                          "example": "maria456"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            },
+            "example": [
+              {
+                "roomName": "General Chat",
+                "users": [
+                  {
+                    "username": "juan123"
+                  },
+                  {
+                    "username": "maria456"
+                  }
+                ]
+              }
+            ]
+          },
+          "404": {
+            "description": "Error retrieving rooms",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "not_found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Delete room",
+        "description": "Delete a room",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rooms Deleted successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roomName": {
+                    "type": "string",
+                    "example": "General Chat"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            },
+            "example": [
+              {
+                "roomName": "General Chat"
+              }
+            ]
+          },
+          "400": {
+            "description": "Error deleting rooms",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "not_found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Rename room",
+        "description": "Rename a room",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rooms Renamed successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "oldRoomName": {
+                    "type": "string",
+                    "example": "General Chat"
+                  },
+                  "newRoomName": {
+                    "type": "string",
+                    "example": "Tuki chat"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            },
+            "example": [
+              {
+                "oldRoomName": "General Chat",
+                "newRoomName": "Tuki chat"
+              }
+            ]
+          },
+          "400": {
+            "description": "Error renaming rooms",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Error renaming rooms"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms/{room}/users": {
+      "post": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Add user",
+        "description": "Add user",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User added successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roomName": {
+                    "type": "string",
+                    "example": "General Chat"
+                  },
+                  "user": {
+                    "type": "string",
+                    "example": "Tuki"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            },
+            "example": [
+              {
+                "roomName": "General Chat",
+                "user": "Tuki"
+              }
+            ]
+          },
+          "404": {
+            "description": "Error rooms",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Room not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms/{room}/users/{user}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    }
+  }
+}
