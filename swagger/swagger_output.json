@@ -1,0 +1,374 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API What do i got",
+    "description": "Documentación de la API para el proyecto What do i got (Mocks con atributos estrictos: roomName y userName)",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/rooms": {
+      "get": {
+        "description": "Obtiene la lista de todas las salas activas.",
+        "responses": {
+          "200": {
+            "description": "Lista de salas obtenida exitosamente",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Room"
+              }
+            },
+            "examples": {
+              "application/json": [
+                {
+                  "roomName": "Sala Gaming",
+                  "userName": "CarlosDev"
+                },
+                {
+                  "roomName": "Estudio Stack",
+                  "userName": "AnaCode"
+                }
+              ]
+            }
+          },
+          "404": {
+            "description": "No se encontraron salas disponibles",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "error": "Not Found",
+                "message": "No hay salas creadas en este momento."
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Crea una nueva sala.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Room"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Sala creada de forma exitosa",
+            "schema": {
+              "$ref": "#/definitions/Room"
+            },
+            "examples": {
+              "application/json": {
+                "roomName": "Sala de Desarrolladores",
+                "userName": "CarlosDev"
+              }
+            }
+          },
+          "400": {
+            "description": "Petición incorrecta, faltan campos obligatorios",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "error": "Bad Request",
+                "message": "Los campos 'roomName' y 'userName' son obligatorios."
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto, la sala ya existe",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "error": "Conflict",
+                "message": "Ya existe una sala activa con ese nombre."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms/{room}": {
+      "get": {
+        "description": "Obtiene la información de una sala específica.",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "Sala Gaming"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información de la sala devuelta correctamente",
+            "schema": {
+              "$ref": "#/definitions/Room"
+            },
+            "examples": {
+              "application/json": {
+                "roomName": "Sala Gaming",
+                "userName": "CarlosDev"
+              }
+            }
+          },
+          "404": {
+            "description": "La sala especificada no existe",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            },
+            "examples": {
+              "application/json": {
+                "error": "Not Found",
+                "message": "La sala solicitada no pudo ser encontrada."
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Elimina una sala por completo.",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "Sala Gaming"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sala eliminada con éxito",
+            "schema": {
+              "$ref": "#/definitions/SuccessResponse"
+            },
+            "examples": {
+              "application/json": {
+                "success": true,
+                "message": "La sala ha sido destruida y removida correctamente."
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Actualiza las propiedades de la sala.",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "Sala Gaming"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Room"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sala modificada exitosamente",
+            "schema": {
+              "$ref": "#/definitions/Room"
+            },
+            "examples": {
+              "application/json": {
+                "roomName": "Sala Gaming Modificada",
+                "userName": "CarlosDev"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms/{room}/users": {
+      "post": {
+        "description": "Agrega o une un nuevo usuario a una sala existente.",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "Sala Gaming"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userName": {
+                  "type": "string",
+                  "example": "AnaCode"
+                }
+              },
+              "required": [
+                "userName"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Usuario unido a la sala con éxito",
+            "schema": {
+              "$ref": "#/definitions/Room"
+            },
+            "examples": {
+              "application/json": {
+                "roomName": "Sala Gaming",
+                "userName": "AnaCode"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms/{room}/users/{user}": {
+      "delete": {
+        "description": "Expulsa o remueve a un usuario de una sala.",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "Sala Gaming"
+          },
+          {
+            "name": "user",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "AnaCode"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario removido correctamente",
+            "schema": {
+              "$ref": "#/definitions/SuccessResponse"
+            },
+            "examples": {
+              "application/json": {
+                "success": true,
+                "message": "El usuario ha sido removido de la sala con éxito."
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Actualiza las propiedades de un usuario dentro de la sala.",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "Sala Gaming"
+          },
+          {
+            "name": "user",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "AnaCode"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userName": {
+                  "type": "string",
+                  "example": "AnaCodeNuevoNombre"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Propiedades de usuario modificadas",
+            "schema": {
+              "$ref": "#/definitions/Room"
+            },
+            "examples": {
+              "application/json": {
+                "roomName": "Sala Gaming",
+                "userName": "AnaCodeNuevoNombre"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Room": {
+      "type": "object",
+      "required": [
+        "roomName",
+        "userName"
+      ],
+      "properties": {
+        "roomName": {
+          "type": "string",
+          "example": "Sala de Prueba"
+        },
+        "userName": {
+          "type": "string",
+          "example": "UsuarioEjemplo"
+        }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "SuccessResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
