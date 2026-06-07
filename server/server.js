@@ -6,11 +6,9 @@ const http = require('http').Server(app);
 const cors = require('cors');
 const handleRoomEvents = require('./controllers/roomHandlers');
 const roomsController = require('./controllers/roomsController');
-const RoomRoutes = require('./routes/RoomRoutes');
 
 app.use(cors());
 app.use(express.json());
-app.use('/api', RoomRoutes);
 
 const io = require('socket.io')(http, {
     cors: {
@@ -23,6 +21,17 @@ io.on('connection', (socket) => {
     handleRoomEvents(socket, io)
 });
 
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Hello world',
+  });
+});
+
+// Lista todas las rooms con sus usuarios
+app.get('/api/rooms', (req, res) => {
+  res.json(roomsController.getAll())
+})
+
 // Obtiene una room por nombre
 app.get('/api/rooms/:room', (req, res) => {
   const room = roomsController.getRoom(req.params.room)
@@ -30,6 +39,13 @@ app.get('/api/rooms/:room', (req, res) => {
   res.json(room)
 })
 
+// Crea una room (opcionalmente con un usuario inicial)
+app.post('/api/rooms', (req, res) => {
+  const { roomName, user } = req.body
+  const result = roomsController.createRoom(roomName, user)
+  if (!result.ok) return res.status(409).json({ error: result.error })
+  res.status(201).json({ ok: true })
+})
 
 // Renombrar room
 app.put('/api/rooms/:room', (req, res) => {
