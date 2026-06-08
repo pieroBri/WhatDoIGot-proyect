@@ -1,14 +1,14 @@
 import React from 'react'
 import PlayerCard from './PlayerCard'
-import './GameBoard.css'
+import { useRoom } from '../context/RoomContext'
 
-type Player = { name: string; avatar: string }
+function GameBoard(): JSX.Element {
+  const { playersList } = useRoom()
 
-function GameBoard({ players }: { players: Player[] }): JSX.Element {
   return (
-    <div className="game-board">
-      {players.map((player, index) => (
-        <PlayerCard key={index} name={player.name} avatar={player.avatar} />
+    <div className="game-board grid grid-cols-2 sm:grid-cols-3 gap-4 p-6">
+      {playersList.map((player) => (
+        <PlayerCard key={player.id} name={player.name} avatar={player.avatar || ''} />
       ))}
     </div>
   )
