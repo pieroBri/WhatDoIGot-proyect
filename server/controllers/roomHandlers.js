@@ -63,6 +63,15 @@ function handleRoomEvents(socket, io) {
         }
     });
 
+    socket.on('startGame', (roomName) => {
+        const room = roomsController.getRoom(roomName)
+        if (room) {
+            io.to(roomName).emit('startGame')
+        } else {
+            socket.emit('room_noexiste')
+        }
+    });
+
     socket.on('disconnect', () => {
         console.log('🔥: A user disconnected', socket.id)
         const result = roomsController.removeUserById(socket.id)

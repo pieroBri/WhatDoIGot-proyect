@@ -26,6 +26,12 @@ export const WaitingLobby = (): JSX.Element | null => {
         socket.emit("toggleReady", roomName, userName);
     };
 
+    const startGame = () => {
+        if (!socket || !roomName || !userName) return;
+        socket.emit("startGame", roomName);
+        setState(RoomState.IN_GAME);
+    };
+
     const isCurrentUserMaster = playersList.some(
         (player) => player.name === userName && player.isMaster,
     );
@@ -90,6 +96,7 @@ export const WaitingLobby = (): JSX.Element | null => {
                                     ? "Todos los jugadores deben estar listos para iniciar el juego"
                                     : "Iniciar el juego"
                             }
+                            onClick={startGame}
                         >
                             Start Game
                         </button>
