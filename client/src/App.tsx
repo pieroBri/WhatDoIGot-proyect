@@ -8,17 +8,19 @@ function AppContent(): JSX.Element {
 
     return (
         <div className="container-dark">
-            <div className="card-dark">
-                {error && (
-                    <div className="mb-4 p-4 bg-red-500/20 border border-red-500 text-red-300 rounded-md">
-                        {error}
-                    </div>
-                )}
+            {state !== RoomState.IN_GAME && (
+                <div className="card-dark">
+                    {error && (
+                        <div className="mb-4 p-4 bg-red-500/20 border border-red-500 text-red-300 rounded-md">
+                            {error}
+                        </div>
+                    )}
 
-                {state === RoomState.ROOM_FORM && <RoomManager />}
-                {state === RoomState.WAITING_LOBBY && <WaitingLobby />}
-                {state === RoomState.IN_GAME && <GameBoard />}
-            </div>
+                    {state === RoomState.ROOM_FORM && <RoomManager />}
+                    {state === RoomState.WAITING_LOBBY && <WaitingLobby />}
+                </div>
+            )}
+            {state === RoomState.IN_GAME && <GameBoard />}
         </div>
     );
 }

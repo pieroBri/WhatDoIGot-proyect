@@ -20,10 +20,10 @@ function GameBoard(): JSX.Element {
     };
 
     return (
-        <div className="flex items-center justify-center w-[1000px] h-[1200px] bg-slate-900 p-6">
+        <div className="flex items-center justify-center w-[1000px] h-[850px] bg-gray-800 p-6 border border-slate-600 rounded-lg shadow-lg">
             {/* Circular game board container */}
             <div
-                className="relative border border-slate-700 rounded-full"
+                className="relative border border-slate-600 rounded-full"
                 style={{
                     width: `${DEFAULT_LAYOUT_CONFIG.containerSize}px`,
                     height: `${DEFAULT_LAYOUT_CONFIG.containerSize}px`,
