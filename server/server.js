@@ -6,6 +6,7 @@ const http = require('http').Server(app);
 const cors = require('cors');
 const handleRoomEvents = require('./controllers/roomHandlers');
 const roomsController = require('./controllers/roomsController');
+const gamesController = require('./controllers/gamesController');
 
 app.use(cors());
 app.use(express.json());
@@ -95,4 +96,25 @@ app.delete('/api/rooms/', (req, res) => {  const { roomName } = req.body
 
 http.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
-  });
+});
+
+app.get('/api/games/load/:page_size', async (req, res) => {
+    const result = await gamesController.getGamesFromApi(req.params.page_size);
+    console.log('result after'+result.ok);
+    console.log('result after'+result.count);
+    console.log('result after'+result.games);
+
+    if(!result.ok) return res.status(500).json({ error: result.error });
+    res.json(result);
+})
+
+app.get('/api/games/loadFile', (req, res) => {
+    const result = gamesController.getGamesFromJson();
+
+    res.json(result);
+})
+
+
+app.get('/api/games', (req, res) => {
+  res.json(gamesController.getAllGames());
+})
