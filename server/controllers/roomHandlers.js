@@ -1,4 +1,5 @@
 const roomsController = require('./roomsController')
+const gamesController = require('./gamesController')
 
 /*
     Socket es el cable y io la caja, cualquier acutialización o proceso aplicado sobre io afectara a todas las instacias.
@@ -79,8 +80,15 @@ function handleRoomEvents(socket, io) {
     });
 
     socket.on('startGame', (roomName) => {
+        const games = gamesController.getGamesFromJson();
         const room = roomsController.getRoom(roomName)
+
         if (room) {
+            room.users.forEach((user, index) => {
+                const game = games[Math.floor(Math.random() * games.length)];
+                user.avatar = game.background_image
+            })
+            io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
             io.to(roomName).emit('startGame')
         } else {
             socket.emit('room_noexiste')
