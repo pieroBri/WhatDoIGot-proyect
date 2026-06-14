@@ -7,7 +7,7 @@ import {
 } from "../utils/gameboardLayout";
 
 function GameBoard(): JSX.Element {
-    const { playersList, socket } = useRoom();
+    const { playersList, socket, roomName } = useRoom();
     const n = playersList.length;
 
     // Find current player index to position them at bottom
@@ -62,6 +62,9 @@ function GameBoard(): JSX.Element {
                                 name={player.name}
                                 avatar={player.avatar || ""}
                                 isMe={isMe}
+                                isTurnoActivo={Boolean(player.isTurnoActivo)}
+                                socket={socket}
+                                roomName={roomName}
                             />
                         </div>
                     );

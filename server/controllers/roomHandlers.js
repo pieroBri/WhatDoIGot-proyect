@@ -5,7 +5,7 @@ const roomsController = require('./roomsController')
 */
 function handleRoomEvents(socket, io) {
     socket.on('createRoom', (roomName, userName) => {
-        const result = roomsController.createRoom(roomName, { id: socket.id, name: userName, isReady: false, isMaster: true })
+        const result = roomsController.createRoom(roomName, { id: socket.id, name: userName, isReady: false, isMaster: true, isTurnoActivo: true })
         if (!result.ok) {
             if (result.error === 'room_exists') {
                 console.log(`El room ${roomName} ya existe`)
@@ -24,7 +24,7 @@ function handleRoomEvents(socket, io) {
     socket.on('joinRoom', (roomName, userName) => {
         const room = roomsController.getRoom(roomName)
         if (room) {
-            roomsController.addUser(roomName, { id: socket.id, name: userName, isReady: false, isMaster: false })
+            roomsController.addUser(roomName, { id: socket.id, name: userName, isReady: false, isMaster: false, isTurnoActivo: false })
             socket.join(roomName)
             io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
         } else {
@@ -54,6 +54,21 @@ function handleRoomEvents(socket, io) {
             const user = room.users.find(user => user.name === userName)
             if(user){
                 user.isReady = !user.isReady
+                io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
+            }else{
+                socket.emit('user_noexiste')
+            }
+        }else{
+           socket.emit('room_noexiste') 
+        }
+    });
+
+    socket.on('pasarTurno', (roomName, userName) => {
+        const room = roomsController.getRoom(roomName)
+        if(room){
+            const user = room.users.find(user => user.name === userName)
+            if(user){
+                pasarTurno(roomName, userName)
                 io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
             }else{
                 socket.emit('user_noexiste')
@@ -95,12 +110,29 @@ function handleRoomEvents(socket, io) {
 
 }
 
+function pasarTurno(roomName, userName) {
+    const room = roomsController.getRoom(roomName)
+    const currentUser = room.users.find(user => user.name === userName)
+    if (currentUser) {
+        currentUser.isTurnoActivo = false
+        const currentIndex = room.users.indexOf(currentUser)
+        const nextIndex = (currentIndex + 1) % room.users.length
+        const nextUser = room.users[nextIndex]
+        nextUser.isTurnoActivo = true
+    }
+}
+
 function asignarMaster(roomName) {
     const room = roomsController.getRoom(roomName)
     if (room) {
         const masterUser = room.users.find(user => user.isMaster)
         if (!masterUser && room.users.length > 0) {
             room.users[0].isMaster = true
+            // Si nadie tiene el turno activo, asignarlo al nuevo master
+            const someoneHasTurn = room.users.some(u => u.isTurnoActivo)
+            if (!someoneHasTurn) {
+                room.users[0].isTurnoActivo = true
+            }
             console.log(`El usuario ${room.users[0].name} ha sido asignado como master del room ${roomName}`)
         }
     }

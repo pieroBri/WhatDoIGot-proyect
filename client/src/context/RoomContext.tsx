@@ -22,6 +22,7 @@ type Player = {
     isReady?: boolean;
     avatar?: string;
     isMaster?: boolean;
+    isTurnoActivo?: boolean;
 };
 
 interface RoomContextType {
@@ -92,6 +93,7 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
         socket.on("roomYaExistente", handleRoomYaExistente);
         socket.on("updateRoom", handleUpdateRoom);
         socket.on("startGame", handleGameStarted);
+        socket.on("pasarTurno", handleUpdateRoom); // Reutilizamos el mismo handler para actualizar el estado del turno
 
         return () => {
             socket.off("connect", handleConnect);
