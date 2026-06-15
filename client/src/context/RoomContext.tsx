@@ -16,27 +16,38 @@ export enum RoomState {
     DISCONNECTED = "DISCONNECTED",
 }
 
-type Player = {
+export type Game = {
+    id: string;
+    name: string;
+    avatar: string;
+};
+
+export type Player = {
     id: string;
     name: string;
     isReady?: boolean;
-    avatar?: string;
+    game?: Game;
     isMaster?: boolean;
     isTurnoActivo?: boolean;
 };
+
+export type StatusMessage = {
+    type: "success" | "error" | "info";
+    text: string;
+} | null;
 
 interface RoomContextType {
     state: RoomState;
     roomName: string | null;
     userName: string | null;
     playersList: Player[];
-    error: string | null;
+    statusMessage: StatusMessage;
     socket: Socket | null;
     setRoomName: (name: string) => void;
     setUserName: (name: string) => void;
     setPlayersList: (players: Player[]) => void;
     setState: (state: RoomState) => void;
-    setError: (error: string | null) => void;
+    setStatusMessage: (m: StatusMessage) => void;
 }
 
 const RoomContext = createContext<RoomContextType | undefined>(undefined);
@@ -46,7 +57,7 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
     const [roomName, setRoomName] = useState<string | null>(null);
     const [userName, setUserName] = useState<string | null>(null);
     const [playersList, setPlayersList] = useState<Player[]>([]);
-    const [error, setError] = useState<string | null>(null);
+    const [statusMessage, setStatusMessage] = useState<StatusMessage>(null);
     const socketRef = useRef<Socket | null>(null);
 
     useEffect(() => {
@@ -61,29 +72,50 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
 
         const handleConnect = () => {
             console.log("Conectado al servidor");
-            setError(null);
+            setStatusMessage(null);
             setState(RoomState.WAITING_LOBBY);
         };
 
         const handleRoomNoExiste = () => {
-            setError("La sala ingresada no existe");
+            setStatusMessage({
+                type: "error",
+                text: "La sala ingresada no existe",
+            });
             socket.disconnect();
             setState(RoomState.ROOM_FORM);
         };
 
         const handleRoomYaExistente = () => {
-            setError("La sala ingresada ya existe");
+            setStatusMessage({
+                type: "error",
+                text: "La sala ingresada ya existe",
+            });
             socket.disconnect();
             setState(RoomState.ROOM_FORM);
         };
 
         const handleUpdateRoom = (users: Player[]) => {
-            setError(null);
             setPlayersList(users);
         };
 
         const handleGameStarted = () => {
             setState(RoomState.IN_GAME);
+        };
+
+        const handleRespuestaCorrecta = (userName: string) => {
+            setStatusMessage({
+                type: "success",
+                text: `${userName} respondió correctamente`,
+            });
+            setTimeout(() => setStatusMessage(null), 3000);
+        };
+
+        const handleRespuestaIncorrecta = (userName: string) => {
+            setStatusMessage({
+                type: "error",
+                text: `${userName} respondió incorrectamente`,
+            });
+            setTimeout(() => setStatusMessage(null), 3000);
         };
 
         if (!socket) return;
@@ -93,6 +125,8 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
         socket.on("roomYaExistente", handleRoomYaExistente);
         socket.on("updateRoom", handleUpdateRoom);
         socket.on("startGame", handleGameStarted);
+        socket.on("respuesta_correcta", handleRespuestaCorrecta);
+        socket.on("respuesta_incorrecta", handleRespuestaIncorrecta);
         socket.on("pasarTurno", handleUpdateRoom); // Reutilizamos el mismo handler para actualizar el estado del turno
 
         return () => {
@@ -101,6 +135,8 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
             socket.off("roomYaExistente", handleRoomYaExistente);
             socket.off("updateRoom", handleUpdateRoom);
             socket.off("startGame", handleGameStarted);
+            socket.off("respuesta_correcta", handleRespuestaCorrecta);
+            socket.off("respuesta_incorrecta", handleRespuestaIncorrecta);
             if (socketRef.current?.connected) {
                 socketRef.current.disconnect();
             }
@@ -114,13 +150,13 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
                 roomName,
                 userName,
                 playersList,
-                error,
+                statusMessage,
                 socket: socketRef.current,
                 setRoomName,
                 setUserName,
                 setPlayersList,
                 setState,
-                setError,
+                setStatusMessage,
             }}
         >
             {children}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 function PlayerCard({
     name,
@@ -17,10 +17,19 @@ function PlayerCard({
 }): JSX.Element {
     const placeholder = "https://picsum.photos/seed/picsum/200/300";
 
+    const [respuesta, setRespuesta] = useState<string | null>(null);
+
     const pasarTurno = () => {
         console.log("Pasar turno clicked");
         if (socket) {
             socket.emit("pasarTurno", roomName, name); // roomName y userName deberían ser obtenidos del contexto o props
+        }
+    };
+
+    const responder = () => {
+        console.log("Responder clicked");
+        if (socket) {
+            socket.emit("responder", roomName, name, respuesta);
         }
     };
 
@@ -80,6 +89,8 @@ function PlayerCard({
                     type="text"
                     placeholder="Escribe algo..."
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-1 text-sm text-slate-900 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                    value={respuesta || ""}
+                    onChange={(e) => setRespuesta(e.target.value)}
                 />
 
                 <div className="flex gap-3">
@@ -96,6 +107,7 @@ function PlayerCard({
                     </button>
                     <button
                         disabled={!isTurnoActivo}
+                        onClick={isTurnoActivo ? responder : undefined}
                         className={`flex-1 rounded-xl px-4 py-2 text-sm font-medium text-white transition ${
                             isTurnoActivo
                                 ? "border border-slate-200 bg-green-600 hover:bg-green-700"

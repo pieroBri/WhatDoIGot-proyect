@@ -1,13 +1,13 @@
-import React from "react";
-import PlayerCard from "./ui/PlayerCard";
-import { useRoom } from "../context/RoomContext";
+import { useEffect } from "react";
+import { Player, useRoom } from "../context/RoomContext";
 import {
     calculatePlayerPosition,
     DEFAULT_LAYOUT_CONFIG,
 } from "../utils/gameboardLayout";
+import PlayerCard from "./ui/PlayerCard";
 
 function GameBoard(): JSX.Element {
-    const { playersList, socket, roomName } = useRoom();
+    const { playersList, socket, roomName, statusMessage } = useRoom();
     const n = playersList.length;
 
     // Find current player index to position them at bottom
@@ -19,8 +19,30 @@ function GameBoard(): JSX.Element {
         startAngle: Math.PI / 2, // Bottom position
     };
 
+    useEffect(() => {
+        console.log("GameBoard debug:", {
+            playersList,
+            myIndex,
+        });
+    }, [playersList, myIndex]);
+
     return (
         <div className="flex items-center justify-center w-[1000px] h-[850px] bg-gray-800 p-6 border border-slate-600 rounded-lg shadow-lg">
+            {statusMessage && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
+                    <div
+                        className={`px-4 py-2 rounded shadow-md text-white ${
+                            statusMessage.type === "success"
+                                ? "bg-green-600"
+                                : statusMessage.type === "error"
+                                  ? "bg-red-600"
+                                  : "bg-blue-600"
+                        }`}
+                    >
+                        {statusMessage.text}
+                    </div>
+                </div>
+            )}
             {/* Circular game board container */}
             <div
                 className="relative border border-slate-600 rounded-full"
@@ -37,7 +59,7 @@ function GameBoard(): JSX.Element {
                 </div>
 
                 {/* Player cards distributed in circle */}
-                {playersList.map((player, i) => {
+                {playersList.map((player: Player, i) => {
                     const isMe = socket?.id === player.id;
                     // Rotate player index so current player is always at position 0 (bottom)
                     const rotatedIndex =
@@ -60,7 +82,7 @@ function GameBoard(): JSX.Element {
                         >
                             <PlayerCard
                                 name={player.name}
-                                avatar={player.avatar || ""}
+                                avatar={player.game?.avatar ?? ""}
                                 isMe={isMe}
                                 isTurnoActivo={Boolean(player.isTurnoActivo)}
                                 socket={socket}

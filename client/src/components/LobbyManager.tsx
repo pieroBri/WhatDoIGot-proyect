@@ -110,15 +110,8 @@ export const WaitingLobby = (): JSX.Element | null => {
 };
 
 function RoomManager(): JSX.Element {
-    const {
-        roomName,
-        userName,
-        setRoomName,
-        setUserName,
-        setState,
-        setError,
-        socket,
-    } = useRoom();
+    const { roomName, userName, setRoomName, setUserName, setState, socket } =
+        useRoom();
 
     const createRoom = () => {
         if (!socket || !roomName || !userName) return;

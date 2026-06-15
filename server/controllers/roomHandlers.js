@@ -86,7 +86,11 @@ function handleRoomEvents(socket, io) {
         if (room) {
             room.users.forEach((user, index) => {
                 const game = games[Math.floor(Math.random() * games.length)];
-                user.avatar = game.background_image
+                user.game = {
+                    id: game.id,
+                    name: game.name,
+                    avatar: game.background_image
+                }
             })
             io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
             io.to(roomName).emit('startGame')
@@ -94,6 +98,41 @@ function handleRoomEvents(socket, io) {
             socket.emit('room_noexiste')
         }
     });
+
+    socket.on('responder', (roomName, userName, respuesta) => {
+        const room = roomsController.getRoom(roomName)
+
+        if (room) {
+            const user = room.users.find(u => u.name === userName)
+            if (user) {
+                if (respuesta === user.game.name) {
+                    console.log(`El usuario ${userName} ha respondido correctamente!`)
+                    io.to(roomName).emit('respuesta_correcta', userName)
+                } else {
+                    console.log(`El usuario ${userName} ha respondido incorrectamente!`)
+                    pasarTurno(roomName, userName)
+                    io.to(roomName).emit('respuesta_incorrecta', userName)
+                    io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
+                }
+            }
+        }
+    });
+
+    // socket.on('endGame', (roomName) => {
+    //     const room = roomsController.getRoom(roomName)
+
+    //     if (room) {
+    //         room.users.forEach((user) => {
+    //             delete user.game
+    //             user.isReady = false
+    //             user.isMaster === true ? user.isTurnoActivo = true : false
+    //         })
+    //         io.to(roomName).emit('updateRoom', roomsController.getRoom(roomName).users)
+    //         io.to(roomName).emit('endGame')
+    //     } else {
+    //         socket.emit('room_noexiste')
+    //     }
+    // });
 
     socket.on('disconnect', () => {
         console.log('🔥: A user disconnected', socket.id)

@@ -38,7 +38,6 @@ class GameController{
 
     // Guardar en archivo
     getGamesFromJson() {
-        console.log('hola');
         try {
             const dir = path.dirname(this.gamesFile);
             if (!fs.existsSync(dir)) {
@@ -57,6 +56,7 @@ class GameController{
         } 
         catch (error) {
             console.error('❌ Error guardando juegos:', error.message);
+            return [];
         }
     }
 
